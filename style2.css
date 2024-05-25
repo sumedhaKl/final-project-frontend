@@ -8,7 +8,7 @@ body, h1, h2, p {
 }
 
 body {
-    background-color: #97e8f7;
+    background-color: black;
     font-family: Arial, sans-serif;
     line-height: 1.6;
 }
@@ -16,31 +16,40 @@ body {
 h1 {
     text-align: center;
     margin: 20px 0;
-    color: #333;
+    color: skyblue;
 }
 
 p.creator-info {
     text-align: center;
     font-style: italic;
-    color: #666;
+    color: skyblue;
 }
 
 h2 {
     margin-top: 30px;
-    color: #333;
+    color: white;
 }
 
 p.categories {
     margin-top: 10px;
     font-weight: bold;
+    color: white;
 }
 
 a {
-    color: #007bff;
+    color: skyblue;
     text-decoration: none;
     cursor: pointer;
 }
 
 a:hover {
     text-decoration: underline;
+}
+
+#pastOrdersList, #discountList {
+    color: white;
+}
+
+#result {
+    color: white;
 }

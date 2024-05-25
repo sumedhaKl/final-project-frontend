@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extended Shopping Site</title>
+    <link rel="stylesheet" type="text/css" href="style2.css">
+</head>
+<body>
+    <span class="logo">🛒</span>
+    <h1>Welcome to the shopping site! Here you can buy what you want any time!</h1>
+
+    <h2>Categories:</h2>
+    <select id="categorySelect" onchange="showProducts()">
+        <option value="clothing">Clothing</option>
+        <option value="food">Food</option>
+        <option value="household">Household Items</option>
+        <option value="gardening">Garden Products</option>
+        <option value="accessories">Accessories</option>
+        <option value="musicalinstruments">Musical Instruments</option>
+    </select>
+
+    <div id="productList"></div>
+
+    <div id="orderTracking">
+        <h2>Order Tracking:</h2>
+        <p id="orderStatus"></p>
+        <button onclick="placeOrder()">Place Order</button>
+    </div>
+
+    <div id="pastOrders">
+        <h2>Past Orders:</h2>
+        <ul id="pastOrdersList"></ul>
+    </div>
+
+    <div id="discounts">
+        <h2>Discounts Available</h2>
+        <ul id="discountList"></ul>
+    </div>
+
+    <p>Already have an account? <a href="login.html">Login</a></p>
+    <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+
+    <div id="result"></div>
+
+    <script src="shopping.js"></script>
+</body>
+</html>
