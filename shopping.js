@@ -23,7 +23,7 @@ const products = {
         { name: "Bracelet", price: 50 },
         { name: "Ring", price: 70 },
         { name: "Earrings", price: 100 },
-        { name: "Necklace", price: 150}
+        { name: "Necklace", price: 150 }
     ],
     musicalinstruments: [
         { name: "Violin", price: 75 },
@@ -44,6 +44,7 @@ function applyDiscounts() {
     discounts.forEach(discountItem => {
         const discountElement = document.createElement('li');
         discountElement.textContent = `${discountItem.name}: ${discountItem.discount * 100}% off`;
+        discountElement.style.color = 'white';
         discountList.appendChild(discountElement);
     });
 }
@@ -59,7 +60,7 @@ function showProducts() {
         productList.forEach(product => {
             const discount = discounts.find(d => d.name === product.name);
             const finalPrice = discount ? product.price * (1 - discount.discount) : product.price;
-            html += `<li><input type="checkbox" value="${product.name}" data-price="${finalPrice}" onchange="toggleProduct(this, ${finalPrice})">${product.name} - $${finalPrice.toFixed(2)}</li>`;
+            html += `<li style="color: white;"><input type="checkbox" value="${product.name}" data-price="${finalPrice}" onchange="toggleProduct(this, ${finalPrice})">${product.name} - $${finalPrice.toFixed(2)}</li>`;
         });
         html += "</ul>";
         productListDiv.innerHTML = html;
@@ -91,19 +92,29 @@ function placeOrder() {
 
     selectedProducts.forEach(product => {
         totalCost += product.price;
-        const newOrder = {date: new Date().toISOString().split('T')[0], product: product.name, price: product.price, status: "Processing"};
+        const newOrder = { date: new Date().toISOString().split('T')[0], product: product.name, price: product.price, status: "Processing" };
         const listItem = document.createElement("li");
-        listItem.textContent = `${newOrder.date}: ${newOrder.product} - $${newOrder.price.toFixed(2)} (${newOrder.status})`;
+        listItem.textContent = `${newOrder.date}: ${newOrder.product} - $${newOrder.price} (${newOrder.status})`;
+        listItem.style.color = 'white';
         pastOrdersList.appendChild(listItem);
     });
 
     const totalElement = document.createElement("p");
     totalElement.textContent = `Total: $${totalCost.toFixed(2)}`;
+    totalElement.style.color = 'white';
     pastOrdersList.appendChild(totalElement);
 
-    localStorage.setItem("pastOrders", JSON.stringify(Array.from(pastOrdersList.children).map(item => item.textContent)));
+    fetchFromPostman().then(predictedPrice => {
+        if (predictedPrice !== null) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<h2>Prediction Result</h2>';
+            resultDiv.innerHTML += `<p>Predicted Price from Postman: $${predictedPrice}</p>`;
+        }
 
-    selectedProducts = [];
+        localStorage.setItem("pastOrders", JSON.stringify(Array.from(pastOrdersList.children).map(item => item.textContent)));
+
+        selectedProducts = [];
+    });
 }
 
 function resetOrders() {
@@ -117,41 +128,15 @@ function displayPastOrders() {
     if (storedOrders) {
         storedOrders.forEach(order => {
             const listItem = document.createElement("li");
+            listItem.style.color = 'white';
             listItem.textContent = order;
             pastOrdersList.appendChild(listItem);
         });
     }
 }
 
-function fetchFromPostman() {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const raw = JSON.stringify({
-        "category": "Food",
-        "items_ordered": "bread",
-        "quantity_ordered": 1,
-        "price_per_item": 2
-    });
-    const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow"
-    };
-    fetch("http://127.0.0.1:8086/api/shopping/predict", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            var resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '<h2>Prediction Result</h2>';
-            resultDiv.innerHTML += '<p>Predicted Price from Postman: ' + (data.predicted_price ? 'Price': 'Price') + '</p>';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-}
-
 window.onload = function() {
     displayPastOrders();
-    applyDiscounts();
     resetOrders();
+    applyDiscounts();
 };

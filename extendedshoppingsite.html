@@ -38,11 +38,98 @@
         <ul id="discountList"></ul>
     </div>
 
+    <div id="result">
+        <h2>Prediction Result</h2>
+        <p id="totalPrice">Total Price from Postman: </p>
+    </div>
+
     <p>Already have an account? <a href="login.html">Login</a></p>
     <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
 
-    <div id="result"></div>
-
     <script src="shopping.js"></script>
+
+    <script>
+        let selectedCategory;
+        let selectedProducts = [];
+
+        function fetchFromPostman() {
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            const raw = JSON.stringify({
+                "category": selectedCategory,
+                "items_ordered": selectedProducts.map(product => product.name).join(", "),
+                "quantity_ordered": selectedProducts.length,
+                "price_per_item": selectedProducts.reduce((total, product) => total + product.price, 0)
+            });
+            const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow"
+            };
+            return fetch("http://127.0.0.1:8086/api/shopping/predict", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    return data;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    return null;
+                });
+        }
+
+        async function placeOrder() {
+            if (selectedProducts.length === 0) {
+                alert("Please select a category and at least one product before placing an order.");
+                return;
+            }
+
+            const orderStatusElement = document.getElementById("orderStatus");
+            orderStatusElement.textContent = "Order placed. Estimated delivery: 3 days.";
+
+            const pastOrdersList = document.getElementById("pastOrdersList");
+            let totalCost = 0;
+
+            selectedProducts.forEach(product => {
+                totalCost += product.price;
+                const newOrder = { date: new Date().toISOString().split('T')[0], product: product.name, price: product.price, status: "Processing" };
+                const listItem = document.createElement("li");
+                listItem.textContent = `${newOrder.date}: ${newOrder.product} - $${newOrder.price} (${newOrder.status})`;
+                listItem.style.color = 'white';
+                pastOrdersList.appendChild(listItem);
+            });
+
+            const totalElement = document.createElement("p");
+            totalElement.textContent = `Total: $${totalCost.toFixed(2)}`;
+            totalElement.style.color = 'white';
+            pastOrdersList.appendChild(totalElement);
+
+            const postmanData = await fetchFromPostman();
+
+            if (postmanData !== null) {
+                const totalPriceElement = document.getElementById('totalPrice');
+                totalPriceElement.textContent = `Total Price from Postman: $${postmanData.total_price}`;
+
+                const discountList = document.getElementById('discountList');
+                discountList.innerHTML = '';
+                postmanData.discounts.forEach(discount => {
+                    const discountElement = document.createElement('li');
+                    discountElement.textContent = `${discount.name}: ${discount.discount * 100}% off`;
+                    discountElement.style.color = 'white';
+                    discountList.appendChild(discountElement);
+                });
+            }
+
+            localStorage.setItem("pastOrders", JSON.stringify(Array.from(pastOrdersList.children).map(item => item.textContent)));
+
+            selectedProducts = [];
+        }
+
+        window.onload = function() {
+            displayPastOrders();
+            resetOrders();
+            applyDiscounts();
+        };
+    </script>
 </body>
 </html>

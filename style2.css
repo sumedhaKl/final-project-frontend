@@ -46,7 +46,7 @@ a:hover {
     text-decoration: underline;
 }
 
-#pastOrdersList, #discountList, #productList {
+#pastOrdersList, #discountList, #productList, #orderTracking {
     color: white;
 }
 
